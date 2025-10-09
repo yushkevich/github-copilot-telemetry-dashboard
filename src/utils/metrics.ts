@@ -1,4 +1,4 @@
-import { DayMetrics, DayAggregates, TelemetryStore } from '@/src/types/copilot';
+import { DayMetrics, DayAggregates, TelemetryStore, IDECodeCompletions, IDEChat, DotcomPullRequests } from '@/src/types/copilot';
 
 export function mergeByDate(files: DayMetrics[][]): DayMetrics[] {
   const map = new Map<string, DayMetrics>();
@@ -11,19 +11,23 @@ export function mergeByDate(files: DayMetrics[][]): DayMetrics[] {
         cur.total_active_users += d.total_active_users;
         cur.total_engaged_users += d.total_engaged_users;
         if (d.copilot_ide_code_completions) {
-          cur.copilot_ide_code_completions = cur.copilot_ide_code_completions || { total_engaged_users: 0, editors: [] } as any;
-          cur.copilot_ide_code_completions.total_engaged_users += d.copilot_ide_code_completions.total_engaged_users;
-          (cur.copilot_ide_code_completions.editors as any) = [
-            ...((cur.copilot_ide_code_completions.editors ?? []) as any),
-            ...((d.copilot_ide_code_completions.editors ?? []) as any),
+          if (!cur.copilot_ide_code_completions) {
+            cur.copilot_ide_code_completions = { total_engaged_users: 0, editors: [] } as IDECodeCompletions;
+          }
+          cur.copilot_ide_code_completions!.total_engaged_users += d.copilot_ide_code_completions.total_engaged_users;
+          cur.copilot_ide_code_completions!.editors = [
+            ...(cur.copilot_ide_code_completions!.editors ?? []),
+            ...(d.copilot_ide_code_completions.editors ?? []),
           ];
         }
         if (d.copilot_ide_chat) {
-          cur.copilot_ide_chat = cur.copilot_ide_chat || { total_engaged_users: 0, editors: [] } as any;
-          cur.copilot_ide_chat.total_engaged_users += d.copilot_ide_chat.total_engaged_users;
-          (cur.copilot_ide_chat.editors as any) = [
-            ...((cur.copilot_ide_chat.editors ?? []) as any),
-            ...((d.copilot_ide_chat.editors ?? []) as any),
+          if (!cur.copilot_ide_chat) {
+            cur.copilot_ide_chat = { total_engaged_users: 0, editors: [] } as IDEChat;
+          }
+          cur.copilot_ide_chat!.total_engaged_users += d.copilot_ide_chat.total_engaged_users;
+          cur.copilot_ide_chat!.editors = [
+            ...(cur.copilot_ide_chat!.editors ?? []),
+            ...(d.copilot_ide_chat.editors ?? []),
           ];
         }
         if (d.copilot_dotcom_chat) {
@@ -31,11 +35,13 @@ export function mergeByDate(files: DayMetrics[][]): DayMetrics[] {
           cur.copilot_dotcom_chat.total_engaged_users += d.copilot_dotcom_chat.total_engaged_users;
         }
         if (d.copilot_dotcom_pull_requests) {
-          cur.copilot_dotcom_pull_requests = cur.copilot_dotcom_pull_requests || { total_engaged_users: 0 } as any;
-          cur.copilot_dotcom_pull_requests.total_engaged_users += d.copilot_dotcom_pull_requests.total_engaged_users;
-          (cur.copilot_dotcom_pull_requests.repositories as any) = [
-            ...((cur.copilot_dotcom_pull_requests.repositories ?? []) as any),
-            ...((d.copilot_dotcom_pull_requests.repositories ?? []) as any),
+          if (!cur.copilot_dotcom_pull_requests) {
+            cur.copilot_dotcom_pull_requests = { total_engaged_users: 0 } as DotcomPullRequests;
+          }
+          cur.copilot_dotcom_pull_requests!.total_engaged_users += d.copilot_dotcom_pull_requests.total_engaged_users;
+          cur.copilot_dotcom_pull_requests!.repositories = [
+            ...(cur.copilot_dotcom_pull_requests!.repositories ?? []),
+            ...(d.copilot_dotcom_pull_requests.repositories ?? []),
           ];
         }
       }
@@ -77,20 +83,24 @@ export function aggregateByWeek(days: DayMetrics[]): DayMetrics[] {
       cur.total_active_users += d.total_active_users;
       cur.total_engaged_users += d.total_engaged_users;
       if (d.copilot_ide_code_completions) {
-        cur.copilot_ide_code_completions = cur.copilot_ide_code_completions || { total_engaged_users: 0, editors: [] } as any;
-        cur.copilot_ide_code_completions.total_engaged_users += d.copilot_ide_code_completions.total_engaged_users;
+        if (!cur.copilot_ide_code_completions) {
+          cur.copilot_ide_code_completions = { total_engaged_users: 0, editors: [] } as IDECodeCompletions;
+        }
+        cur.copilot_ide_code_completions!.total_engaged_users += d.copilot_ide_code_completions.total_engaged_users;
         const editors = (d.copilot_ide_code_completions.editors ?? []);
-        (cur.copilot_ide_code_completions.editors as any) = [
-          ...((cur.copilot_ide_code_completions.editors ?? []) as any),
+        cur.copilot_ide_code_completions!.editors = [
+          ...(cur.copilot_ide_code_completions!.editors ?? []),
           ...editors,
         ];
       }
       if (d.copilot_ide_chat) {
-        cur.copilot_ide_chat = cur.copilot_ide_chat || { total_engaged_users: 0, editors: [] } as any;
-        cur.copilot_ide_chat.total_engaged_users += d.copilot_ide_chat.total_engaged_users;
+        if (!cur.copilot_ide_chat) {
+          cur.copilot_ide_chat = { total_engaged_users: 0, editors: [] } as IDEChat;
+        }
+        cur.copilot_ide_chat!.total_engaged_users += d.copilot_ide_chat.total_engaged_users;
         const editors = (d.copilot_ide_chat.editors ?? []);
-        (cur.copilot_ide_chat.editors as any) = [
-          ...((cur.copilot_ide_chat.editors ?? []) as any),
+        cur.copilot_ide_chat!.editors = [
+          ...(cur.copilot_ide_chat!.editors ?? []),
           ...editors,
         ];
       }
@@ -99,11 +109,13 @@ export function aggregateByWeek(days: DayMetrics[]): DayMetrics[] {
         cur.copilot_dotcom_chat.total_engaged_users += d.copilot_dotcom_chat.total_engaged_users;
       }
       if (d.copilot_dotcom_pull_requests) {
-        cur.copilot_dotcom_pull_requests = cur.copilot_dotcom_pull_requests || { total_engaged_users: 0 } as any;
-        cur.copilot_dotcom_pull_requests.total_engaged_users += d.copilot_dotcom_pull_requests.total_engaged_users;
+        if (!cur.copilot_dotcom_pull_requests) {
+          cur.copilot_dotcom_pull_requests = { total_engaged_users: 0 } as DotcomPullRequests;
+        }
+        cur.copilot_dotcom_pull_requests!.total_engaged_users += d.copilot_dotcom_pull_requests.total_engaged_users;
         const repos = (d.copilot_dotcom_pull_requests.repositories ?? []);
-        (cur.copilot_dotcom_pull_requests.repositories as any) = [
-          ...((cur.copilot_dotcom_pull_requests.repositories ?? []) as any),
+        cur.copilot_dotcom_pull_requests!.repositories = [
+          ...(cur.copilot_dotcom_pull_requests!.repositories ?? []),
           ...repos,
         ];
       }
@@ -125,7 +137,7 @@ export function bucketTopN<T extends { name: string; value: number }>(items: T[]
 
 export function calcKpis(days: DayMetrics[]): TelemetryStore {
   const agg: DayAggregates[] = [];
-  let totals: TelemetryStore['totals'] = {
+  const totals: TelemetryStore['totals'] = {
     active_users: 0,
     engaged_users: 0,
     completions_engaged_users: 0,
@@ -149,7 +161,7 @@ export function calcKpis(days: DayMetrics[]): TelemetryStore {
 
   let fitness_missing_cc = 0;
   let fitness_missing_chat = 0;
-  let fitness_rate_over_1 = 0;
+  // retained for possible future use; derived metric is computed later on agg
 
   for (const d of days) {
     let suggestions = 0;

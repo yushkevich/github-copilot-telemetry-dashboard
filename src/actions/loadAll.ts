@@ -30,7 +30,11 @@ export async function loadMergedAll(onlyFiles?: string[]): Promise<DayMetrics[]>
     // Re-read only selected files from the detected source directory
     const chosen: DayMetrics[][] = [];
     for (const f of onlyFiles) {
-      try { chosen.push(JSON.parse(await (await import('fs/promises')).readFile(require('path').join(srcDir, f), 'utf8'))); } catch {}
+      try {
+        const { readFile } = await import('fs/promises');
+        const { join } = await import('path');
+        chosen.push(JSON.parse(await readFile(join(srcDir, f), 'utf8')));
+      } catch {}
     }
     arrays = chosen;
   }

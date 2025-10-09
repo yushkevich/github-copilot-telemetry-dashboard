@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 import archiver from 'archiver';
 import { createReadStream, existsSync } from 'fs';
 import { promises as fs } from 'fs';
@@ -6,7 +5,7 @@ import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const root = path.resolve(process.cwd(), '..');
   const dir = path.join(root, 'telemetry_anonymized');
   const fallback = path.join(root, 'telemetry');
@@ -26,7 +25,8 @@ export async function GET(_req: NextRequest) {
     }
     archive.finalize();
 
-    return new Response(stream as any, {
+    const webStream = stream as unknown as ReadableStream<Uint8Array>;
+    return new Response(webStream, {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': 'attachment; filename="telemetry_anonymized.zip"',
